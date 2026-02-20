@@ -16,6 +16,7 @@
     let newDealHighlight = $state<string | null>(null);
     let isLoading = $state(true);
     let unsubscribe: (() => void) | null = null;
+    let tickerItems = $state<string[]>([]);
 
     // Build leaderboard from deals
     function buildLeaderboard(allDeals: Deal[]): LeaderboardEntry[] {
@@ -120,6 +121,14 @@
                         setTimeout(() => {
                             newDealHighlight = null;
                         }, 3000);
+
+                        // Push to ticker
+                        const brand = e.record.brand_name
+                            ? ` (${e.record.brand_name})`
+                            : "";
+                        const amt = `Rp ${formatRupiah(e.record.jumlah_transaksi)}`;
+                        const msg = `🎉 ${e.record.nama_mitra}${brand} — ${amt}`;
+                        tickerItems = [msg, ...tickerItems].slice(0, 8);
 
                         const newTop =
                             leaderboard.length > 0
@@ -432,6 +441,20 @@
             {/if}
         {/if}
     </main>
+
+    <!-- Deal Ticker -->
+    {#if tickerItems.length > 0}
+        <div class="ticker-bar">
+            <span class="ticker-label">🔴 LIVE</span>
+            <div class="ticker-track">
+                <div class="ticker-content">
+                    {#each [...tickerItems, ...tickerItems] as item, i (i)}
+                        <span class="ticker-item">{item}</span>
+                    {/each}
+                </div>
+            </div>
+        </div>
+    {/if}
 </div>
 
 <style>
@@ -1068,6 +1091,92 @@
 
         .info-sep {
             display: none;
+        }
+    }
+
+    /* ============================================
+       Deal Ticker
+       ============================================ */
+    .ticker-bar {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        z-index: 50;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        background: rgba(15, 22, 41, 0.92);
+        border-top: 1px solid rgba(255, 215, 0, 0.15);
+        backdrop-filter: blur(12px);
+        overflow: hidden;
+        animation: fadeInUp 0.5s ease;
+    }
+
+    :global([data-theme="light"]) .ticker-bar {
+        background: rgba(255, 255, 255, 0.94);
+        border-top: 1px solid rgba(212, 160, 23, 0.2);
+    }
+
+    .ticker-label {
+        flex-shrink: 0;
+        padding: 0 14px;
+        font-size: 11px;
+        font-weight: 800;
+        color: #ef4444;
+        letter-spacing: 0.8px;
+        border-right: 1px solid rgba(239, 68, 68, 0.25);
+        height: 100%;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        background: rgba(239, 68, 68, 0.07);
+    }
+
+    .ticker-track {
+        flex: 1;
+        overflow: hidden;
+        position: relative;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        mask-image: linear-gradient(
+            to right,
+            transparent 0%,
+            black 4%,
+            black 96%,
+            transparent 100%
+        );
+    }
+
+    .ticker-content {
+        display: flex;
+        align-items: center;
+        gap: 0;
+        animation: ticker-scroll 28s linear infinite;
+        white-space: nowrap;
+    }
+
+    .ticker-item {
+        display: inline-flex;
+        align-items: center;
+        padding: 0 32px;
+        font-size: 13px;
+        font-weight: 600;
+        color: var(--text-secondary);
+        border-right: 1px solid var(--border-color);
+    }
+
+    .ticker-item:last-child {
+        border-right: none;
+    }
+
+    @keyframes ticker-scroll {
+        0% {
+            transform: translateX(0);
+        }
+        100% {
+            transform: translateX(-50%);
         }
     }
 </style>

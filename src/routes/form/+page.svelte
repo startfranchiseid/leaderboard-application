@@ -243,16 +243,50 @@
                             </button>
                         </div>
                     {:else}
-                        <label class="file-upload" for="fotoMitra">
-                            <div class="upload-icon">📷</div>
-                            <span>Tap untuk ambil/pilih foto</span>
-                            <span class="upload-hint">JPG, PNG, max 5MB</span>
-                        </label>
+                        <div class="photo-actions">
+                            <button
+                                type="button"
+                                class="photo-btn camera-btn"
+                                onclick={() => {
+                                    const el = document.getElementById(
+                                        "fotoCam",
+                                    ) as HTMLInputElement;
+                                    el?.click();
+                                }}
+                            >
+                                <span class="photo-btn-icon">📷</span>
+                                <span class="photo-btn-label">Ambil Foto</span>
+                                <span class="photo-btn-hint">Buka kamera</span>
+                            </button>
+                            <button
+                                type="button"
+                                class="photo-btn gallery-btn"
+                                onclick={() => {
+                                    const el = document.getElementById(
+                                        "fotoGallery",
+                                    ) as HTMLInputElement;
+                                    el?.click();
+                                }}
+                            >
+                                <span class="photo-btn-icon">🖼️</span>
+                                <span class="photo-btn-label">Dari Galeri</span>
+                                <span class="photo-btn-hint">Pilih file</span>
+                            </button>
+                        </div>
+                        <!-- Hidden camera input -->
                         <input
-                            id="fotoMitra"
+                            id="fotoCam"
                             type="file"
                             accept="image/*"
                             capture="environment"
+                            onchange={handleFileChange}
+                            class="file-input-hidden"
+                        />
+                        <!-- Hidden gallery input -->
+                        <input
+                            id="fotoGallery"
+                            type="file"
+                            accept="image/*"
                             onchange={handleFileChange}
                             class="file-input-hidden"
                         />
@@ -557,43 +591,58 @@
         font-weight: 500;
     }
 
-    /* File Upload */
+    /* Photo Actions */
     .file-input-hidden {
         display: none;
     }
 
-    .file-upload {
+    .photo-actions {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+    }
+
+    .photo-btn {
         display: flex;
         flex-direction: column;
         align-items: center;
         justify-content: center;
-        padding: 28px;
+        gap: 6px;
+        padding: 24px 16px;
         border: 2px dashed var(--border-color);
         border-radius: var(--radius-lg);
         cursor: pointer;
         transition: all var(--transition-fast);
-        gap: 8px;
         background: var(--bg-card);
+        font-family: var(--font-family);
     }
 
-    .file-upload:hover {
+    .photo-btn:hover {
         border-color: var(--accent-blue);
         background: rgba(59, 130, 246, 0.05);
+        transform: translateY(-2px);
     }
 
-    .upload-icon {
+    .camera-btn:hover {
+        border-color: var(--accent-green);
+        background: rgba(16, 185, 129, 0.05);
+    }
+    .gallery-btn:hover {
+        border-color: var(--accent-purple);
+        background: rgba(139, 92, 246, 0.05);
+    }
+
+    .photo-btn-icon {
         font-size: 32px;
     }
-
-    .file-upload span {
+    .photo-btn-label {
         font-size: 14px;
-        color: var(--text-secondary);
-        font-weight: 500;
+        font-weight: 600;
+        color: var(--text-primary);
     }
-
-    .upload-hint {
-        color: var(--text-muted) !important;
-        font-size: 12px !important;
+    .photo-btn-hint {
+        font-size: 12px;
+        color: var(--text-muted);
     }
 
     .photo-preview {
