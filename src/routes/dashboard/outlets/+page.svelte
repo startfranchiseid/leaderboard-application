@@ -184,21 +184,48 @@
 <div class="outlets-page">
     <div class="page-header">
         <div>
-            <h1 class="page-title">🏪 Kelola Outlet</h1>
+            <h1 class="page-title">Kelola Outlet</h1>
             <p class="page-sub">
                 Buat dan kelola outlet peserta expo, share link form
             </p>
         </div>
-        <button class="btn btn-primary" onclick={openCreate}
-            >+ Tambah Outlet</button
-        >
+        <button class="btn btn-primary" onclick={openCreate}>
+            <svg
+                class="btn-icon"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2.5"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                ><line x1="12" y1="5" x2="12" y2="19" /><line
+                    x1="5"
+                    y1="12"
+                    x2="19"
+                    y2="12"
+                /></svg
+            >
+            Tambah Outlet
+        </button>
     </div>
 
     {#if isLoading}
         <div class="loading-box">Memuat...</div>
     {:else if outlets.length === 0}
         <div class="empty-box">
-            <p>🏪 Belum ada outlet. Klik "Tambah Outlet" untuk mulai.</p>
+            <svg
+                class="empty-icon"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.5"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                ><path
+                    d="M20 4H4v2h16V4zm1 10v-2l-1-5H4l-1 5v2h1v6h10v-6h4v6h2v-6h1zm-9 4H6v-4h6v4z"
+                /></svg
+            >
+            <p>Belum ada outlet. Klik "Tambah Outlet" untuk mulai.</p>
         </div>
     {:else}
         <div class="outlet-grid">
@@ -209,19 +236,46 @@
                             class="card-status"
                             class:active={outlet.is_active}
                         >
-                            {outlet.is_active ? "● Aktif" : "○ Nonaktif"}
+                            <span class="status-dot"></span>
+                            {outlet.is_active ? "Aktif" : "Nonaktif"}
                         </div>
                         <div class="card-actions">
                             <button
                                 class="icon-btn"
                                 onclick={() => openEdit(outlet)}
-                                title="Edit">✏️</button
+                                title="Edit"
                             >
+                                <svg
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    stroke-width="2"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    ><path
+                                        d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"
+                                    /><path
+                                        d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"
+                                    /></svg
+                                >
+                            </button>
                             <button
-                                class="icon-btn"
+                                class="icon-btn icon-btn-danger"
                                 onclick={() => deleteOutlet(outlet)}
-                                title="Hapus">🗑️</button
+                                title="Hapus"
                             >
+                                <svg
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    stroke-width="2"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    ><polyline points="3 6 5 6 21 6" /><path
+                                        d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"
+                                    /></svg
+                                >
+                            </button>
                         </div>
                     </div>
 
@@ -235,10 +289,39 @@
                     {#if dealStats[outlet.id]}
                         <div class="card-stats">
                             <span class="stat-pill deals-pill">
-                                🤝 {dealStats[outlet.id].count} deals
+                                <svg
+                                    class="pill-icon"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    stroke-width="2"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    ><path d="M16.5 9.4l-9-5.19" /><path
+                                        d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"
+                                    /></svg
+                                >
+                                {dealStats[outlet.id].count} deals
                             </span>
                             <span class="stat-pill money-pill">
-                                💰 Rp {formatRupiah(dealStats[outlet.id].total)}
+                                <svg
+                                    class="pill-icon"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    stroke-width="2"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    ><line
+                                        x1="12"
+                                        y1="1"
+                                        x2="12"
+                                        y2="23"
+                                    /><path
+                                        d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"
+                                    /></svg
+                                >
+                                Rp {formatRupiah(dealStats[outlet.id].total)}
                             </span>
                         </div>
                     {:else}
@@ -254,7 +337,21 @@
                             class="btn btn-share"
                             onclick={() => openShare(outlet)}
                         >
-                            🔗 Share Link
+                            <svg
+                                class="btn-icon"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="2"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                ><path
+                                    d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"
+                                /><path
+                                    d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"
+                                /></svg
+                            >
+                            Share
                         </button>
                         <a
                             href="/dashboard/outlets/{outlet.id}/qr"
@@ -262,7 +359,24 @@
                             target="_blank"
                             rel="noopener"
                         >
-                            🖨️ Print QR
+                            <svg
+                                class="btn-icon"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="2"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                ><polyline points="6 9 6 2 18 2 18 9" /><path
+                                    d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"
+                                /><rect
+                                    x="6"
+                                    y="14"
+                                    width="12"
+                                    height="8"
+                                /></svg
+                            >
+                            Print QR
                         </a>
                         <button
                             class="btn btn-toggle"
@@ -321,8 +435,23 @@
                             <button
                                 class="btn btn-sm"
                                 onclick={() => (formToken = generateToken())}
-                                >🔄 Generate</button
                             >
+                                <svg
+                                    class="btn-icon-sm"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    stroke-width="2"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    ><polyline
+                                        points="23 4 23 10 17 10"
+                                    /><polyline points="1 20 1 14 7 14" /><path
+                                        d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"
+                                    /></svg
+                                >
+                                Generate
+                            </button>
                         {/if}
                     </div>
                 </label>
@@ -332,7 +461,26 @@
                 </label>
 
                 {#if saveError}
-                    <p class="error-msg">⚠️ {saveError}</p>
+                    <p class="error-msg">
+                        <svg
+                            class="error-icon"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            ><path
+                                d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"
+                            /><line x1="12" y1="9" x2="12" y2="13" /><line
+                                x1="12"
+                                y1="17"
+                                x2="12.01"
+                                y2="17"
+                            /></svg
+                        >
+                        {saveError}
+                    </p>
                 {/if}
 
                 <div class="modal-actions">
@@ -374,7 +522,23 @@
             onclick={(e) => e.stopPropagation()}
             role="document"
         >
-            <h2>🔗 Share Form Link</h2>
+            <h2>
+                <svg
+                    class="modal-title-icon"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    ><path
+                        d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"
+                    /><path
+                        d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"
+                    /></svg
+                >
+                Share Form Link
+            </h2>
             <p class="share-outlet-name">{shareOutlet.name}</p>
 
             <div class="share-url-box">
@@ -384,7 +548,40 @@
                     value={getFormUrl(shareOutlet.access_token)}
                 />
                 <button class="btn btn-copy" onclick={copyLink}>
-                    {copied ? "✅ Copied!" : "📋 Copy"}
+                    {#if copied}
+                        <svg
+                            class="btn-icon"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2.5"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            ><polyline points="20 6 9 17 4 12" /></svg
+                        >
+                        Copied!
+                    {:else}
+                        <svg
+                            class="btn-icon"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            ><rect
+                                x="9"
+                                y="9"
+                                width="13"
+                                height="13"
+                                rx="2"
+                                ry="2"
+                            /><path
+                                d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"
+                            /></svg
+                        >
+                        Copy
+                    {/if}
                 </button>
             </div>
 
@@ -447,6 +644,8 @@
 
     .outlet-card:hover {
         border-color: var(--accent-blue);
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-md);
     }
     .outlet-card.inactive {
         opacity: 0.6;
@@ -463,10 +662,24 @@
         font-size: 12px;
         font-weight: 600;
         color: var(--accent-red);
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
     }
 
     .card-status.active {
         color: var(--accent-green);
+    }
+
+    .status-dot {
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        background: currentColor;
+    }
+
+    .card-status.active .status-dot {
+        animation: pulse 2s infinite;
     }
 
     .card-actions {
@@ -478,14 +691,28 @@
         background: none;
         border: none;
         cursor: pointer;
-        font-size: 16px;
-        padding: 4px;
+        padding: 6px;
         border-radius: var(--radius-sm);
-        transition: background var(--transition-fast);
+        transition: all var(--transition-fast);
+        color: var(--text-muted);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .icon-btn svg {
+        width: 16px;
+        height: 16px;
     }
 
     .icon-btn:hover {
         background: var(--bg-card-elevated);
+        color: var(--text-primary);
+    }
+
+    .icon-btn-danger:hover {
+        background: rgba(239, 68, 68, 0.1);
+        color: var(--accent-red);
     }
 
     .card-name {
@@ -526,11 +753,17 @@
     .stat-pill {
         display: inline-flex;
         align-items: center;
-        gap: 4px;
+        gap: 5px;
         padding: 4px 10px;
         border-radius: var(--radius-full);
         font-size: 12px;
         font-weight: 600;
+    }
+
+    .pill-icon {
+        width: 13px;
+        height: 13px;
+        flex-shrink: 0;
     }
 
     .deals-pill {
@@ -562,6 +795,17 @@
         background: var(--bg-card);
         border: 1px solid var(--border-color);
         border-radius: var(--radius-lg);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .empty-icon {
+        width: 40px;
+        height: 40px;
+        color: var(--text-muted);
+        opacity: 0.5;
     }
 
     /* Buttons */
@@ -578,6 +822,18 @@
         cursor: pointer;
         transition: all var(--transition-fast);
         white-space: nowrap;
+    }
+
+    .btn-icon {
+        width: 16px;
+        height: 16px;
+        flex-shrink: 0;
+    }
+
+    .btn-icon-sm {
+        width: 14px;
+        height: 14px;
+        flex-shrink: 0;
     }
 
     .btn-primary {
@@ -685,6 +941,15 @@
         font-weight: 700;
         color: var(--text-heading);
         margin-bottom: 20px;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .modal-title-icon {
+        width: 22px;
+        height: 22px;
+        color: var(--accent-blue);
     }
 
     .modal-form {
@@ -742,6 +1007,15 @@
     .error-msg {
         font-size: 13px;
         color: var(--accent-red);
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .error-icon {
+        width: 16px;
+        height: 16px;
+        flex-shrink: 0;
     }
 
     .modal-actions {
@@ -755,6 +1029,10 @@
     .share-modal {
         text-align: center;
         max-width: 420px;
+    }
+
+    .share-modal h2 {
+        justify-content: center;
     }
 
     .share-outlet-name {

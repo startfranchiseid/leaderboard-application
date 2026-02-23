@@ -14,9 +14,24 @@
     let isReady = $state(false); // prevent flash
 
     const navItems = [
-        { href: "/dashboard", label: "Overview", icon: "📊" },
-        { href: "/dashboard/outlets", label: "Kelola Outlet", icon: "🏪" },
-        { href: "/dashboard/deals", label: "Deals", icon: "🤝" },
+        {
+            href: "/dashboard",
+            label: "Overview",
+            iconPath:
+                "M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z",
+        },
+        {
+            href: "/dashboard/outlets",
+            label: "Kelola Outlet",
+            iconPath:
+                "M20 4H4v2h16V4zm1 10v-2l-1-5H4l-1 5v2h1v6h10v-6h4v6h2v-6h1zm-9 4H6v-4h6v4z",
+        },
+        {
+            href: "/dashboard/deals",
+            label: "Deals",
+            iconPath:
+                "M16.48 10.41c-.39.39-1.04.39-1.43 0l-4.47-4.46-7.05 7.04-.66-.63 3.7-3.7L.7 2.84 2.12 1.4l2.83 2.83 3.7-3.7 5.83 5.84 3.7-3.71 1.42 1.42-3.12 3.12v0z",
+        },
     ];
 
     onMount(() => {
@@ -63,7 +78,19 @@
     <!-- PIN Gate -->
     <div class="pin-gate">
         <div class="pin-card">
-            <div class="pin-icon">🔐</div>
+            <div class="pin-icon">
+                <svg
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1.5"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                >
+                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                    <path d="M9 12l2 2 4-4" />
+                </svg>
+            </div>
             <h1 class="pin-title">Admin Dashboard</h1>
             <p class="pin-sub">Masukkan PIN untuk melanjutkan</p>
 
@@ -81,14 +108,57 @@
             </div>
 
             {#if pinError}
-                <p class="pin-error">❌ PIN salah. Coba lagi.</p>
+                <p class="pin-error">
+                    <svg
+                        class="pin-error-icon"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        ><circle cx="12" cy="12" r="10" /><line
+                            x1="15"
+                            y1="9"
+                            x2="9"
+                            y2="15"
+                        /><line x1="9" y1="9" x2="15" y2="15" /></svg
+                    >
+                    PIN salah. Coba lagi.
+                </p>
             {/if}
 
             <button class="pin-btn" onclick={handlePinSubmit}>
-                Masuk →
+                Masuk
+                <svg
+                    class="btn-arrow"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2.5"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    ><line x1="5" y1="12" x2="19" y2="12" /><polyline
+                        points="12 5 19 12 12 19"
+                    /></svg
+                >
             </button>
 
-            <a href="/" class="back-link">← Kembali ke Leaderboard</a>
+            <a href="/" class="back-link">
+                <svg
+                    class="back-icon"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    ><line x1="19" y1="12" x2="5" y2="12" /><polyline
+                        points="12 19 5 12 12 5"
+                    /></svg
+                >
+                Kembali ke Leaderboard
+            </a>
         </div>
     </div>
 {:else}
@@ -97,7 +167,28 @@
         <!-- Sidebar -->
         <aside class="sidebar">
             <div class="sidebar-header">
-                <span class="sidebar-logo">🏆</span>
+                <div class="sidebar-logo-wrap">
+                    <svg
+                        class="sidebar-logo-icon"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="1.5"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                    >
+                        <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5C7 4 7 7 7 7" />
+                        <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5C17 4 17 7 17 7" />
+                        <path d="M4 22h16" />
+                        <path
+                            d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"
+                        />
+                        <path
+                            d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"
+                        />
+                        <path d="M18 2H6v7a6 6 0 0 0 12 0V2Z" />
+                    </svg>
+                </div>
                 <div>
                     <h2 class="sidebar-title">Expo Franchise</h2>
                     <p class="sidebar-sub">Admin Dashboard</p>
@@ -111,7 +202,11 @@
                         class="nav-item"
                         class:active={$page.url.pathname === item.href}
                     >
-                        <span class="nav-icon">{item.icon}</span>
+                        <span class="nav-icon">
+                            <svg viewBox="0 0 24 24" fill="currentColor"
+                                ><path d={item.iconPath} /></svg
+                            >
+                        </span>
                         <span class="nav-label">{item.label}</span>
                     </a>
                 {/each}
@@ -119,11 +214,45 @@
 
             <div class="sidebar-footer">
                 <a href="/" class="nav-item footer-link">
-                    <span class="nav-icon">📺</span>
+                    <span class="nav-icon">
+                        <svg
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            ><path
+                                d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"
+                            /><polyline points="15 3 21 3 21 9" /><line
+                                x1="10"
+                                y1="14"
+                                x2="21"
+                                y2="3"
+                            /></svg
+                        >
+                    </span>
                     <span class="nav-label">Lihat Leaderboard</span>
                 </a>
                 <button class="nav-item logout-btn" onclick={logout}>
-                    <span class="nav-icon">🔓</span>
+                    <span class="nav-icon">
+                        <svg
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            ><path
+                                d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"
+                            /><polyline points="16 17 21 12 16 7" /><line
+                                x1="21"
+                                y1="12"
+                                x2="9"
+                                y2="12"
+                            /></svg
+                        >
+                    </span>
                     <span class="nav-label">Keluar</span>
                 </button>
             </div>
@@ -184,8 +313,20 @@
     }
 
     .pin-icon {
-        font-size: 48px;
+        width: 64px;
+        height: 64px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(59, 130, 246, 0.1);
+        border-radius: var(--radius-lg);
+        color: var(--accent-blue);
         margin-bottom: 4px;
+    }
+
+    .pin-icon svg {
+        width: 32px;
+        height: 32px;
     }
 
     .pin-title {
@@ -232,6 +373,15 @@
         font-size: 13px;
         color: var(--accent-red);
         font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .pin-error-icon {
+        width: 16px;
+        height: 16px;
+        flex-shrink: 0;
     }
 
     .pin-btn {
@@ -247,6 +397,15 @@
         font-weight: 700;
         cursor: pointer;
         transition: all var(--transition-fast);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+    }
+
+    .btn-arrow {
+        width: 18px;
+        height: 18px;
     }
 
     .pin-btn:hover {
@@ -261,6 +420,14 @@
         text-decoration: none;
         margin-top: 4px;
         transition: color var(--transition-fast);
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .back-icon {
+        width: 14px;
+        height: 14px;
     }
 
     .back-link:hover {
@@ -268,11 +435,22 @@
     }
 
     @keyframes shake {
-        0%, 100% { transform: translateX(0); }
-        20%       { transform: translateX(-8px); }
-        40%       { transform: translateX(8px); }
-        60%       { transform: translateX(-6px); }
-        80%       { transform: translateX(6px); }
+        0%,
+        100% {
+            transform: translateX(0);
+        }
+        20% {
+            transform: translateX(-8px);
+        }
+        40% {
+            transform: translateX(8px);
+        }
+        60% {
+            transform: translateX(-6px);
+        }
+        80% {
+            transform: translateX(6px);
+        }
     }
 
     /* ============================================
@@ -285,7 +463,7 @@
 
     /* Sidebar */
     .sidebar {
-        width: 260px;
+        width: 280px;
         background: var(--bg-card);
         border-right: 1px solid var(--border-color);
         display: flex;
@@ -304,8 +482,21 @@
         margin-bottom: 20px;
     }
 
-    .sidebar-logo {
-        font-size: 28px;
+    .sidebar-logo-wrap {
+        width: 40px;
+        height: 40px;
+        background: linear-gradient(135deg, var(--accent-blue), #06b6d4);
+        border-radius: var(--radius-md);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+    }
+
+    .sidebar-logo-icon {
+        width: 22px;
+        height: 22px;
+        color: white;
     }
 
     .sidebar-title {
@@ -343,6 +534,7 @@
         cursor: pointer;
         width: 100%;
         text-align: left;
+        position: relative;
     }
 
     .nav-item:hover {
@@ -356,8 +548,29 @@
         font-weight: 600;
     }
 
+    .nav-item.active::before {
+        content: "";
+        position: absolute;
+        left: 0;
+        top: 6px;
+        bottom: 6px;
+        width: 3px;
+        border-radius: 0 3px 3px 0;
+        background: var(--accent-blue);
+    }
+
     .nav-icon {
-        font-size: 18px;
+        width: 20px;
+        height: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+    }
+
+    .nav-icon svg {
+        width: 18px;
+        height: 18px;
     }
 
     .nav-label {
@@ -422,6 +635,10 @@
             flex-direction: row;
         }
         .nav-label {
+            display: none;
+        }
+
+        .nav-item.active::before {
             display: none;
         }
 

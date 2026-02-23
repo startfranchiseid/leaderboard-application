@@ -84,7 +84,7 @@
 <div class="overview">
     <div class="page-top">
         <div>
-            <h1 class="page-title">📊 Overview</h1>
+            <h1 class="page-title">Overview</h1>
             <p class="page-sub">
                 Pantau semua aktivitas leaderboard expo franchise
             </p>
@@ -107,14 +107,40 @@
         <!-- Stat Cards -->
         <div class="stat-grid">
             <div class="stat-card">
-                <div class="stat-icon blue">🤝</div>
+                <div class="stat-icon blue">
+                    <svg
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="1.5"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        ><path d="M16.5 9.4l-9-5.19" /><path
+                            d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"
+                        /><polyline
+                            points="3.27 6.96 12 12.01 20.73 6.96"
+                        /><line x1="12" y1="22.08" x2="12" y2="12" /></svg
+                    >
+                </div>
                 <div class="stat-info">
                     <span class="stat-value">{totalDeals}</span>
                     <span class="stat-label">Total Deals</span>
                 </div>
             </div>
             <div class="stat-card">
-                <div class="stat-icon gold">💰</div>
+                <div class="stat-icon gold">
+                    <svg
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="1.5"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        ><line x1="12" y1="1" x2="12" y2="23" /><path
+                            d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"
+                        /></svg
+                    >
+                </div>
                 <div class="stat-info">
                     <span class="stat-value"
                         >Rp {formatRupiah(totalTransaksi)}</span
@@ -123,14 +149,40 @@
                 </div>
             </div>
             <div class="stat-card">
-                <div class="stat-icon green">🏪</div>
+                <div class="stat-icon green">
+                    <svg
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="1.5"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        ><path
+                            d="M20 4H4v2h16V4zm1 10v-2l-1-5H4l-1 5v2h1v6h10v-6h4v6h2v-6h1zm-9 4H6v-4h6v4z"
+                        /></svg
+                    >
+                </div>
                 <div class="stat-info">
                     <span class="stat-value">{totalOutlets}</span>
                     <span class="stat-label">Outlet Aktif</span>
                 </div>
             </div>
             <div class="stat-card">
-                <div class="stat-icon purple">👥</div>
+                <div class="stat-icon purple">
+                    <svg
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="1.5"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        ><path
+                            d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"
+                        /><circle cx="9" cy="7" r="4" /><path
+                            d="M23 21v-2a4 4 0 0 0-3-3.87"
+                        /><path d="M16 3.13a4 4 0 0 1 0 7.75" /></svg
+                    >
+                </div>
                 <div class="stat-info">
                     <span class="stat-value">{totalMitra}</span>
                     <span class="stat-label">Mitra Unik</span>
@@ -141,8 +193,36 @@
         <!-- Recent Deals -->
         <div class="section">
             <div class="section-header">
-                <h2>🕐 Deals Terbaru</h2>
-                <a href="/dashboard/deals" class="view-all">Lihat Semua →</a>
+                <h2>
+                    <svg
+                        class="section-icon"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        ><circle cx="12" cy="12" r="10" /><polyline
+                            points="12 6 12 12 16 14"
+                        /></svg
+                    >
+                    Deals Terbaru
+                </h2>
+                <a href="/dashboard/deals" class="view-all"
+                    >Lihat Semua
+                    <svg
+                        class="view-all-arrow"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2.5"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        ><line x1="5" y1="12" x2="19" y2="12" /><polyline
+                            points="12 5 19 12 12 19"
+                        /></svg
+                    >
+                </a>
             </div>
 
             {#if recentDeals.length === 0}
@@ -153,10 +233,11 @@
                 <div class="deals-list">
                     {#each recentDeals as deal (deal.id)}
                         <div class="deal-row">
+                            <div class="deal-accent"></div>
                             <div class="deal-info">
                                 <span class="deal-name">{deal.nama_mitra}</span>
                                 <span class="deal-meta"
-                                    >{deal.brand_name || "-"} • {deal.outlet_name ||
+                                    >{deal.brand_name || "-"} · {deal.outlet_name ||
                                         "-"}</span
                                 >
                             </div>
@@ -245,7 +326,13 @@
         border: 1px solid var(--border-card);
         border-radius: var(--radius-lg);
         box-shadow: var(--shadow-card);
-        transition: all var(--transition-theme);
+        transition: all var(--transition-fast);
+    }
+
+    .stat-card:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-md);
+        border-color: rgba(59, 130, 246, 0.15);
     }
 
     .stat-card.skeleton {
@@ -267,21 +354,29 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 22px;
         flex-shrink: 0;
+    }
+
+    .stat-icon svg {
+        width: 24px;
+        height: 24px;
     }
 
     .stat-icon.blue {
         background: rgba(59, 130, 246, 0.12);
+        color: var(--accent-blue);
     }
     .stat-icon.gold {
-        background: rgba(255, 215, 0, 0.12);
+        background: rgba(245, 158, 11, 0.12);
+        color: var(--accent-orange);
     }
     .stat-icon.green {
         background: rgba(16, 185, 129, 0.12);
+        color: var(--accent-green);
     }
     .stat-icon.purple {
         background: rgba(139, 92, 246, 0.12);
+        color: var(--accent-purple);
     }
 
     .stat-info {
@@ -319,6 +414,15 @@
         font-size: 18px;
         font-weight: 700;
         color: var(--text-heading);
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .section-icon {
+        width: 20px;
+        height: 20px;
+        color: var(--text-muted);
     }
 
     .view-all {
@@ -326,10 +430,19 @@
         font-weight: 600;
         color: var(--accent-blue);
         text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        transition: gap var(--transition-fast);
     }
 
     .view-all:hover {
-        text-decoration: underline;
+        gap: 8px;
+    }
+
+    .view-all-arrow {
+        width: 14px;
+        height: 14px;
     }
 
     .empty-box {
@@ -350,7 +463,6 @@
 
     .deal-row {
         display: flex;
-        justify-content: space-between;
         align-items: center;
         padding: 14px 18px;
         background: var(--gradient-card);
@@ -358,16 +470,31 @@
         border-radius: var(--radius-md);
         transition: all var(--transition-fast);
         animation: fadeInUp 0.3s ease;
+        gap: 14px;
     }
 
     .deal-row:hover {
         border-color: var(--accent-blue);
+        transform: translateX(2px);
+    }
+
+    .deal-accent {
+        width: 3px;
+        height: 32px;
+        border-radius: 3px;
+        background: linear-gradient(
+            180deg,
+            var(--accent-blue),
+            var(--accent-cyan)
+        );
+        flex-shrink: 0;
     }
 
     .deal-info {
         display: flex;
         flex-direction: column;
         gap: 2px;
+        flex: 1;
     }
 
     .deal-name {

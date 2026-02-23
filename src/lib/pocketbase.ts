@@ -13,3 +13,11 @@ export function getFileUrl(record: { id: string; collectionId: string; collectio
     if (!filename) return '';
     return `${PUBLIC_POCKETBASE_URL}/api/files/${record.collectionId}/${record.id}/${filename}`;
 }
+
+/**
+ * Get brand logo URL from a Brand record
+ */
+export function getBrandLogoUrl(brand: { id: string; collectionId: string; collectionName: string; logo: string } | undefined): string {
+    if (!brand?.logo) return '';
+    return `${PUBLIC_POCKETBASE_URL}/api/files/${brand.collectionId}/${brand.id}/${brand.logo}`;
+}

@@ -142,14 +142,31 @@
 <div class="deals-page">
     <div class="page-header">
         <div>
-            <h1 class="page-title">🤝 Deals</h1>
+            <h1 class="page-title">Deals</h1>
             <p class="page-sub">
                 Semua deal yang tercatat di leaderboard ({filtered.length} dari {deals.length})
             </p>
         </div>
         {#if !isLoading && deals.length > 0}
             <button class="btn btn-export" onclick={exportCSV}>
-                📥 Export CSV
+                <svg
+                    class="btn-icon"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    ><path
+                        d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"
+                    /><polyline points="7 10 12 15 17 10" /><line
+                        x1="12"
+                        y1="15"
+                        x2="12"
+                        y2="3"
+                    /></svg
+                >
+                Export CSV
             </button>
         {/if}
     </div>
@@ -157,7 +174,21 @@
     <!-- Filters -->
     <div class="filters">
         <div class="search-wrap">
-            <span class="search-icon">🔍</span>
+            <svg
+                class="search-icon"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                ><circle cx="11" cy="11" r="8" /><line
+                    x1="21"
+                    y1="21"
+                    x2="16.65"
+                    y2="16.65"
+                /></svg
+            >
             <input
                 type="text"
                 placeholder="Cari mitra, brand, outlet..."
@@ -179,7 +210,24 @@
             {#if searchQuery}
                 <p>Tidak ada deal yang cocok dengan "{searchQuery}"</p>
             {:else}
-                <p>🤝 Belum ada deal tercatat.</p>
+                <svg
+                    class="empty-icon"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1.5"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    ><path d="M16.5 9.4l-9-5.19" /><path
+                        d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"
+                    /><polyline points="3.27 6.96 12 12.01 20.73 6.96" /><line
+                        x1="12"
+                        y1="22.08"
+                        x2="12"
+                        y2="12"
+                    /></svg
+                >
+                <p>Belum ada deal tercatat.</p>
             {/if}
         </div>
     {:else}
@@ -219,9 +267,25 @@
                                 <span class="mitra-name">{deal.nama_mitra}</span
                                 >
                                 {#if deal.lokasi_buka_outlet}
-                                    <span class="mitra-loc"
-                                        >📍 {deal.lokasi_buka_outlet}</span
-                                    >
+                                    <span class="mitra-loc">
+                                        <svg
+                                            class="loc-icon"
+                                            viewBox="0 0 24 24"
+                                            fill="none"
+                                            stroke="currentColor"
+                                            stroke-width="2"
+                                            stroke-linecap="round"
+                                            stroke-linejoin="round"
+                                            ><path
+                                                d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"
+                                            /><circle
+                                                cx="12"
+                                                cy="10"
+                                                r="3"
+                                            /></svg
+                                        >
+                                        {deal.lokasi_buka_outlet}
+                                    </span>
                                 {/if}
                             </div>
                         </div>
@@ -244,8 +308,25 @@
                         <button
                             class="del-btn"
                             onclick={() => deleteDeal(deal)}
-                            title="Hapus">🗑️</button
+                            title="Hapus"
                         >
+                            <svg
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="2"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                ><polyline points="3 6 5 6 21 6" /><path
+                                    d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"
+                                /><line x1="10" y1="11" x2="10" y2="17" /><line
+                                    x1="14"
+                                    y1="11"
+                                    x2="14"
+                                    y2="17"
+                                /></svg
+                            >
+                        </button>
                     </span>
                 </div>
             {/each}
@@ -289,6 +370,12 @@
         transform: translateY(-1px);
     }
 
+    .btn-icon {
+        width: 16px;
+        height: 16px;
+        flex-shrink: 0;
+    }
+
     .page-title {
         font-size: 26px;
         font-weight: 800;
@@ -317,7 +404,10 @@
         left: 14px;
         top: 50%;
         transform: translateY(-50%);
-        font-size: 14px;
+        width: 16px;
+        height: 16px;
+        color: var(--text-muted);
+        pointer-events: none;
     }
 
     .search-wrap input {
@@ -439,22 +529,40 @@
     .mitra-loc {
         font-size: 11px;
         color: var(--text-muted);
+        display: inline-flex;
+        align-items: center;
+        gap: 3px;
+    }
+
+    .loc-icon {
+        width: 12px;
+        height: 12px;
+        flex-shrink: 0;
     }
 
     .del-btn {
         background: none;
         border: none;
         cursor: pointer;
-        font-size: 14px;
-        padding: 4px;
+        padding: 6px;
         border-radius: var(--radius-sm);
-        transition: background var(--transition-fast);
-        opacity: 0.5;
+        transition: all var(--transition-fast);
+        opacity: 0.4;
+        color: var(--text-secondary);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .del-btn svg {
+        width: 16px;
+        height: 16px;
     }
 
     .del-btn:hover {
         opacity: 1;
         background: rgba(239, 68, 68, 0.1);
+        color: var(--accent-red);
     }
 
     /* Empty / Loading */
@@ -466,6 +574,17 @@
         background: var(--bg-card);
         border: 1px solid var(--border-color);
         border-radius: var(--radius-lg);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .empty-icon {
+        width: 40px;
+        height: 40px;
+        color: var(--text-muted);
+        opacity: 0.5;
     }
 
     @media (max-width: 768px) {

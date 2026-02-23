@@ -1,19 +1,21 @@
 <script lang="ts">
     import { onMount } from "svelte";
-    import { pb, getFileUrl } from "$lib/pocketbase";
+    import { pb } from "$lib/pocketbase";
     import { confettiBurst, confettiRain } from "$lib/confetti";
-    import type { ExpoOutlet } from "$lib/types";
+    import type { ExpoOutlet, Brand } from "$lib/types";
 
     // State
-    let token = $state("");
-    let outlet = $state<ExpoOutlet | null>(null);
-    let isValidating = $state(true);
-    let isInvalid = $state(false);
     let isSubmitting = $state(false);
     let showSuccess = $state(false);
+    let isLoading = $state(true);
+
+    let brands = $state<Brand[]>([]);
+    let outlets = $state<ExpoOutlet[]>([]);
 
     // Form fields
     let namaMitra = $state("");
+    let selectedBrandId = $state("");
+    let selectedOutletId = $state("");
     let lokasiBukaOutlet = $state("");
     let jumlahTransaksi = $state<number | null>(null);
     let catatan = $state("");
@@ -23,41 +25,26 @@
     // Error state
     let errors = $state<Record<string, string>>({});
 
-    // Get token from URL
-    onMount(() => {
-        const url = new URL(window.location.href);
-        token = url.searchParams.get("token") || "";
-
-        if (!token) {
-            isValidating = false;
-            isInvalid = true;
-            return;
-        }
-
-        validateToken();
-    });
-
-    async function validateToken() {
+    onMount(async () => {
         try {
-            const records = await pb
-                .collection("expo_outlets")
-                .getFullList<ExpoOutlet>({
-                    filter: `access_token = "${token}" && is_active = true`,
-                });
-
-            if (records.length > 0) {
-                outlet = records[0];
-                isInvalid = false;
-            } else {
-                isInvalid = true;
-            }
+            // Fetch active brands and outlets for dropdowns
+            const [brandsList, outletsList] = await Promise.all([
+                pb.collection("brands").getFullList<Brand>({ sort: "name" }),
+                pb.collection("expo_outlets").getFullList<ExpoOutlet>({
+                    filter: "is_active = true",
+                    sort: "name",
+                }),
+            ]);
+            brands = brandsList;
+            outlets = outletsList;
         } catch (err) {
-            console.error("Token validation failed:", err);
-            isInvalid = true;
+            console.error("Failed to load form data:", err);
+            errors["init"] =
+                "Gagal memuat data formulir. Silakan muat ulang halaman.";
         } finally {
-            isValidating = false;
+            isLoading = false;
         }
-    }
+    });
 
     function handleFileChange(event: Event) {
         const input = event.target as HTMLInputElement;
@@ -65,7 +52,6 @@
 
         if (file) {
             fotoFile = file;
-            // Create preview
             const reader = new FileReader();
             reader.onload = (e) => {
                 fotoPreview = e.target?.result as string;
@@ -86,6 +72,14 @@
             errors["namaMitra"] = "Nama mitra wajib diisi";
         }
 
+        if (!selectedBrandId) {
+            errors["brand"] = "Brand wajib dipilih";
+        }
+
+        if (!selectedOutletId) {
+            errors["outlet"] = "Outlet wajib dipilih";
+        }
+
         if (!jumlahTransaksi || jumlahTransaksi <= 0) {
             errors["jumlahTransaksi"] =
                 "Jumlah transaksi wajib diisi dengan angka valid";
@@ -101,35 +95,38 @@
 
     function handleAmountInput(event: Event) {
         const input = event.target as HTMLInputElement;
-        // Remove non-numeric characters
         const raw = input.value.replace(/[^0-9]/g, "");
         jumlahTransaksi = raw ? parseInt(raw) : null;
-        // Re-format display
         input.value = jumlahTransaksi
             ? jumlahTransaksi.toLocaleString("id-ID")
             : "";
     }
 
     async function handleSubmit() {
-        if (!validate() || !outlet) return;
+        if (!validate()) return;
 
         isSubmitting = true;
 
         try {
+            const selectedBrand = brands.find((b) => b.id === selectedBrandId);
+            const selectedOutlet = outlets.find(
+                (o) => o.id === selectedOutletId,
+            );
+
             const formData = new FormData();
             formData.append("nama_mitra", namaMitra.trim());
-            // Infer brand from outlet
-            if (outlet.brand_name) {
-                formData.append("brand_name", outlet.brand_name);
+            // Relasi ke tabel brands
+            if (selectedBrand) {
+                formData.append("brand", selectedBrand.id);
+                formData.append("brand_name", selectedBrand.name);
             }
-            if (outlet.brand) {
-                formData.append("brand", outlet.brand);
+            if (selectedOutlet) {
+                formData.append("expo_outlet", selectedOutlet.id);
+                formData.append("outlet_name", selectedOutlet.name);
             }
-            formData.append("outlet_name", outlet.name);
             formData.append("lokasi_buka_outlet", lokasiBukaOutlet.trim());
             formData.append("jumlah_transaksi", String(jumlahTransaksi));
             formData.append("catatan", catatan.trim());
-            formData.append("expo_outlet", outlet.id);
 
             if (fotoFile) {
                 formData.append("foto_mitra", fotoFile);
@@ -137,12 +134,10 @@
 
             await pb.collection("deals").create(formData);
 
-            // Success!
             showSuccess = true;
             confettiBurst();
             setTimeout(() => confettiRain(), 300);
 
-            // Reset form after delay
             setTimeout(() => {
                 resetForm();
             }, 3000);
@@ -156,6 +151,8 @@
 
     function resetForm() {
         namaMitra = "";
+        selectedBrandId = "";
+        selectedOutletId = "";
         lokasiBukaOutlet = "";
         jumlahTransaksi = null;
         catatan = "";
@@ -167,26 +164,22 @@
 </script>
 
 <svelte:head>
-    <title>Input Deal — Expo Franchise Manado 2026</title>
+    <title>Input Deal Global — Expo Franchise Manado 2026</title>
 </svelte:head>
 
 <div class="form-page">
-    {#if isValidating}
-        <!-- Loading -->
+    {#if isLoading}
         <div class="center-state">
             <div class="loading-spinner"></div>
-            <p>Memvalidasi token outlet...</p>
+            <p>Memuat formulir...</p>
         </div>
-    {:else if isInvalid}
-        <!-- Invalid Token -->
+    {:else if errors["init"]}
         <div class="center-state error-state">
             <div class="error-icon">🚫</div>
-            <h2>Token Tidak Valid</h2>
-            <p>Token outlet tidak ditemukan atau sudah nonaktif.</p>
-            <p class="hint">Pastikan URL yang diberikan sudah benar.</p>
+            <h2>Terjadi Kesalahan</h2>
+            <p>{errors["init"]}</p>
         </div>
     {:else if showSuccess}
-        <!-- Success -->
         <div class="center-state success-state">
             <div class="success-icon">🎉</div>
             <h2>Deal Berhasil Tercatat!</h2>
@@ -196,12 +189,11 @@
             </button>
         </div>
     {:else}
-        <!-- Form -->
         <div class="form-container">
             <div class="form-header">
-                <div class="outlet-badge">
-                    <span class="outlet-icon">📍</span>
-                    <span>{outlet?.name}</span>
+                <div class="public-badge">
+                    <span class="public-icon">🌍</span>
+                    <span>Global Submit Form</span>
                 </div>
                 <h1>Input Deal Baru</h1>
                 <p>Catat deal franchise baru untuk leaderboard</p>
@@ -216,9 +208,9 @@
             >
                 <!-- Nama Mitra -->
                 <div class="form-group">
-                    <label for="namaMitra">
-                        Nama Mitra <span class="required">*</span>
-                    </label>
+                    <label for="namaMitra"
+                        >Nama Mitra <span class="required">*</span></label
+                    >
                     <input
                         id="namaMitra"
                         type="text"
@@ -226,9 +218,9 @@
                         placeholder="Nama orang yang melakukan deal"
                         class:error={errors["namaMitra"]}
                     />
-                    {#if errors["namaMitra"]}
-                        <span class="error-text">{errors["namaMitra"]}</span>
-                    {/if}
+                    {#if errors["namaMitra"]}<span class="error-text"
+                            >{errors["namaMitra"]}</span
+                        >{/if}
                 </div>
 
                 <!-- Foto Mitra -->
@@ -260,7 +252,6 @@
                             >
                                 <span class="photo-btn-icon">📷</span>
                                 <span class="photo-btn-label">Ambil Foto</span>
-                                <span class="photo-btn-hint">Buka kamera</span>
                             </button>
                             <button
                                 type="button"
@@ -274,10 +265,8 @@
                             >
                                 <span class="photo-btn-icon">🖼️</span>
                                 <span class="photo-btn-label">Dari Galeri</span>
-                                <span class="photo-btn-hint">Pilih file</span>
                             </button>
                         </div>
-                        <!-- Hidden camera input -->
                         <input
                             id="fotoCam"
                             type="file"
@@ -286,7 +275,6 @@
                             onchange={handleFileChange}
                             class="file-input-hidden"
                         />
-                        <!-- Hidden gallery input -->
                         <input
                             id="fotoGallery"
                             type="file"
@@ -295,6 +283,56 @@
                             class="file-input-hidden"
                         />
                     {/if}
+                </div>
+
+                <!-- Brand Dropdown -->
+                <div class="form-group">
+                    <label for="brand"
+                        >Brand <span class="required">*</span></label
+                    >
+                    <div class="select-wrap">
+                        <select
+                            id="brand"
+                            bind:value={selectedBrandId}
+                            class:error={errors["brand"]}
+                        >
+                            <option value="" disabled>Pilih Brand</option>
+                            {#each brands as brand}
+                                <option value={brand.id}>{brand.name}</option>
+                            {/each}
+                        </select>
+                        <div class="select-arrow">▼</div>
+                    </div>
+                    {#if errors["brand"]}<span class="error-text"
+                            >{errors["brand"]}</span
+                        >{/if}
+                </div>
+
+                <!-- Outlet Dropdown -->
+                <div class="form-group">
+                    <label for="outlet"
+                        >Outlet Pameran (Tempat Deal) <span class="required"
+                            >*</span
+                        ></label
+                    >
+                    <div class="select-wrap">
+                        <select
+                            id="outlet"
+                            bind:value={selectedOutletId}
+                            class:error={errors["outlet"]}
+                        >
+                            <option value="" disabled
+                                >Pilih Outlet Pameran</option
+                            >
+                            {#each outlets as outlet}
+                                <option value={outlet.id}>{outlet.name}</option>
+                            {/each}
+                        </select>
+                        <div class="select-arrow">▼</div>
+                    </div>
+                    {#if errors["outlet"]}<span class="error-text"
+                            >{errors["outlet"]}</span
+                        >{/if}
                 </div>
 
                 <!-- Lokasi -->
@@ -310,9 +348,10 @@
 
                 <!-- Jumlah Transaksi -->
                 <div class="form-group">
-                    <label for="transaksi">
-                        Jumlah Transaksi (Rp) <span class="required">*</span>
-                    </label>
+                    <label for="transaksi"
+                        >Jumlah Transaksi (Rp) <span class="required">*</span
+                        ></label
+                    >
                     <div class="input-with-prefix">
                         <span class="input-prefix">Rp</span>
                         <input
@@ -325,11 +364,9 @@
                             class:error={errors["jumlahTransaksi"]}
                         />
                     </div>
-                    {#if errors["jumlahTransaksi"]}
-                        <span class="error-text"
+                    {#if errors["jumlahTransaksi"]}<span class="error-text"
                             >{errors["jumlahTransaksi"]}</span
-                        >
-                    {/if}
+                        >{/if}
                 </div>
 
                 <!-- Catatan -->
@@ -343,22 +380,19 @@
                     ></textarea>
                 </div>
 
-                <!-- Submit Error -->
                 {#if errors["submit"]}
                     <div class="submit-error">
                         <span>⚠️ {errors["submit"]}</span>
                     </div>
                 {/if}
 
-                <!-- Submit Button -->
                 <button
                     type="submit"
                     class="btn btn-submit"
                     disabled={isSubmitting}
                 >
                     {#if isSubmitting}
-                        <span class="btn-spinner"></span>
-                        Mengirim...
+                        <span class="btn-spinner"></span> Mengirim...
                     {:else}
                         🚀 Submit Deal
                     {/if}
@@ -369,9 +403,7 @@
 </div>
 
 <style>
-    /* ============================================
-	   Form Page Layout
-	   ============================================ */
+    /* Styling similar to existing form layout */
     .form-page {
         min-height: 100vh;
         display: flex;
@@ -380,7 +412,6 @@
         padding: 20px;
         background: var(--gradient-body);
     }
-
     .center-state {
         display: flex;
         flex-direction: column;
@@ -390,7 +421,6 @@
         gap: 12px;
         padding: 40px;
     }
-
     .loading-spinner {
         width: 40px;
         height: 40px;
@@ -399,42 +429,28 @@
         border-radius: 50%;
         animation: spin 1s linear infinite;
     }
-
     @keyframes spin {
         to {
             transform: rotate(360deg);
         }
     }
-
     .center-state p {
         color: var(--text-secondary);
     }
-
-    /* Error State */
     .error-state .error-icon {
         font-size: 64px;
     }
-
     .error-state h2 {
         font-size: 24px;
         color: #ef4444;
     }
-
-    .hint {
-        color: var(--text-muted);
-        font-size: 14px;
-    }
-
-    /* Success State */
     .success-state {
         animation: fadeInUp 0.5s ease;
     }
-
     .success-icon {
         font-size: 80px;
         animation: bounce 0.6s ease;
     }
-
     @keyframes bounce {
         0%,
         100% {
@@ -444,7 +460,6 @@
             transform: translateY(-20px);
         }
     }
-
     .success-state h2 {
         font-size: 28px;
         background: linear-gradient(135deg, var(--gold), var(--accent-orange));
@@ -452,39 +467,31 @@
         -webkit-text-fill-color: transparent;
         background-clip: text;
     }
-
-    /* ============================================
-	   Form Container
-	   ============================================ */
     .form-container {
         width: 100%;
         max-width: 520px;
         animation: fadeInUp 0.5s ease;
     }
-
     .form-header {
         text-align: center;
         margin-bottom: 28px;
     }
-
-    .outlet-badge {
+    .public-badge {
         display: inline-flex;
         align-items: center;
         gap: 8px;
         padding: 6px 16px;
         background: var(--bg-card);
-        border: 1px solid rgba(255, 215, 0, 0.3);
+        border: 1px solid rgba(59, 130, 246, 0.3);
         border-radius: var(--radius-full);
         font-size: 14px;
         font-weight: 600;
-        color: var(--gold);
+        color: var(--accent-blue);
         margin-bottom: 16px;
     }
-
-    .outlet-icon {
+    .public-icon {
         font-size: 16px;
     }
-
     .form-header h1 {
         font-size: 28px;
         font-weight: 800;
@@ -494,39 +501,31 @@
         background-clip: text;
         margin-bottom: 4px;
     }
-
     .form-header p {
         color: var(--text-secondary);
         font-size: 14px;
     }
-
-    /* ============================================
-	   Form Fields
-	   ============================================ */
     .deal-form {
         display: flex;
         flex-direction: column;
         gap: 20px;
     }
-
     .form-group {
         display: flex;
         flex-direction: column;
         gap: 8px;
     }
-
     .form-group label {
         font-size: 14px;
         font-weight: 600;
         color: var(--text-secondary);
     }
-
     .required {
         color: #ef4444;
     }
-
     input[type="text"],
-    textarea {
+    textarea,
+    select {
         width: 100%;
         padding: 14px 16px;
         background: var(--bg-card);
@@ -538,28 +537,42 @@
         transition: all var(--transition-fast);
         outline: none;
     }
-
+    .select-wrap {
+        position: relative;
+        width: 100%;
+    }
+    select {
+        appearance: none;
+        cursor: pointer;
+    }
+    .select-arrow {
+        position: absolute;
+        right: 16px;
+        top: 50%;
+        transform: translateY(-50%);
+        pointer-events: none;
+        font-size: 10px;
+        color: var(--text-muted);
+    }
     input[type="text"]:focus,
-    textarea:focus {
+    textarea:focus,
+    select:focus {
         border-color: var(--accent-blue);
         box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
     }
-
     input[type="text"].error,
-    textarea.error {
+    textarea.error,
+    select.error {
         border-color: #ef4444;
     }
-
     textarea {
         resize: vertical;
         min-height: 80px;
     }
-
     .input-with-prefix {
         display: flex;
         align-items: stretch;
     }
-
     .input-prefix {
         display: flex;
         align-items: center;
@@ -572,29 +585,23 @@
         font-weight: 600;
         font-size: 14px;
     }
-
     .input-with-prefix input {
         border-radius: 0 var(--radius-md) var(--radius-md) 0;
         flex: 1;
     }
-
     .error-text {
         font-size: 13px;
         color: #ef4444;
         font-weight: 500;
     }
-
-    /* Photo Actions */
     .file-input-hidden {
         display: none;
     }
-
     .photo-actions {
         display: grid;
         grid-template-columns: 1fr 1fr;
         gap: 12px;
     }
-
     .photo-btn {
         display: flex;
         flex-direction: column;
@@ -609,22 +616,11 @@
         background: var(--bg-card);
         font-family: var(--font-family);
     }
-
     .photo-btn:hover {
         border-color: var(--accent-blue);
         background: rgba(59, 130, 246, 0.05);
         transform: translateY(-2px);
     }
-
-    .camera-btn:hover {
-        border-color: var(--accent-green);
-        background: rgba(16, 185, 129, 0.05);
-    }
-    .gallery-btn:hover {
-        border-color: var(--accent-purple);
-        background: rgba(139, 92, 246, 0.05);
-    }
-
     .photo-btn-icon {
         font-size: 32px;
     }
@@ -633,11 +629,6 @@
         font-weight: 600;
         color: var(--text-primary);
     }
-    .photo-btn-hint {
-        font-size: 12px;
-        color: var(--text-muted);
-    }
-
     .photo-preview {
         position: relative;
         width: 100%;
@@ -646,14 +637,12 @@
         overflow: hidden;
         border: 1px solid var(--border-color);
     }
-
     .photo-preview img {
         width: 100%;
         height: 100%;
         object-fit: cover;
         max-height: 300px;
     }
-
     .remove-photo {
         position: absolute;
         top: 8px;
@@ -671,12 +660,9 @@
         justify-content: center;
         transition: all var(--transition-fast);
     }
-
     .remove-photo:hover {
         background: #ef4444;
     }
-
-    /* Submit Error */
     .submit-error {
         padding: 12px 16px;
         background: rgba(239, 68, 68, 0.1);
@@ -685,10 +671,6 @@
         color: #fca5a5;
         font-size: 14px;
     }
-
-    /* ============================================
-	   Buttons
-	   ============================================ */
     .btn {
         display: inline-flex;
         align-items: center;
@@ -703,18 +685,15 @@
         cursor: pointer;
         transition: all var(--transition-fast);
     }
-
     .btn-primary {
         background: linear-gradient(135deg, #3b82f6, #06b6d4);
         color: white;
         margin-top: 8px;
     }
-
     .btn-primary:hover {
         transform: translateY(-1px);
         box-shadow: var(--shadow-blue);
     }
-
     .btn-submit {
         background: linear-gradient(135deg, #ffd700, #ffa500, #ff8c00);
         color: #1a1a2e;
@@ -722,17 +701,14 @@
         padding: 16px 24px;
         margin-top: 4px;
     }
-
     .btn-submit:hover:not(:disabled) {
         transform: translateY(-2px);
         box-shadow: var(--shadow-gold);
     }
-
     .btn-submit:disabled {
         opacity: 0.7;
         cursor: not-allowed;
     }
-
     .btn-spinner {
         width: 18px;
         height: 18px;
@@ -741,7 +717,6 @@
         border-radius: 50%;
         animation: spin 0.8s linear infinite;
     }
-
     @keyframes fadeInUp {
         from {
             opacity: 0;

@@ -32,6 +32,7 @@
                         ? getFileUrl(deal, deal.foto_mitra)
                         : "",
                     brand_name: deal.brand_name || "",
+                    brands_dealt: [],
                     lokasi_buka_outlet: deal.lokasi_buka_outlet || "",
                     total_transaksi: 0,
                     deal_count: 0,
@@ -43,6 +44,14 @@
             entry.total_transaksi += deal.jumlah_transaksi;
             entry.deal_count += 1;
             entry.deals.push(deal);
+
+            if (
+                deal.brand_name &&
+                !entry.brands_dealt.includes(deal.brand_name)
+            ) {
+                entry.brands_dealt.push(deal.brand_name);
+            }
+
             if (deal.created > entry.latest_deal) {
                 entry.latest_deal = deal.created;
                 if (deal.brand_name) entry.brand_name = deal.brand_name;
@@ -247,9 +256,17 @@
 
                             <div class="podium-pedestal second-pedestal">
                                 <div class="trophy-badge silver-trophy">🥈</div>
-                                <p class="pedestal-subtitle">
-                                    {top3[1].brand_name || "Mitra"}
-                                </p>
+                                <div class="pedestal-brands">
+                                    {#if top3[1].brands_dealt.length > 0}
+                                        {#each top3[1].brands_dealt as b}
+                                            <span class="brand-badge">{b}</span>
+                                        {/each}
+                                    {:else}
+                                        <span class="pedestal-subtitle"
+                                            >Mitra</span
+                                        >
+                                    {/if}
+                                </div>
                                 <div class="pedestal-amount">
                                     <span class="heart-icon">💎</span>
                                     <span class="amount-value"
@@ -297,9 +314,17 @@
 
                             <div class="podium-pedestal first-pedestal">
                                 <div class="trophy-badge gold-trophy">🏆</div>
-                                <p class="pedestal-subtitle">
-                                    {top3[0].brand_name || "Mitra"}
-                                </p>
+                                <div class="pedestal-brands">
+                                    {#if top3[0].brands_dealt.length > 0}
+                                        {#each top3[0].brands_dealt as b}
+                                            <span class="brand-badge">{b}</span>
+                                        {/each}
+                                    {:else}
+                                        <span class="pedestal-subtitle"
+                                            >Mitra</span
+                                        >
+                                    {/if}
+                                </div>
                                 <div class="pedestal-amount first-amount">
                                     <span class="heart-icon">💎</span>
                                     <span class="amount-value"
@@ -340,9 +365,17 @@
 
                             <div class="podium-pedestal third-pedestal">
                                 <div class="trophy-badge bronze-trophy">🥉</div>
-                                <p class="pedestal-subtitle">
-                                    {top3[2].brand_name || "Mitra"}
-                                </p>
+                                <div class="pedestal-brands">
+                                    {#if top3[2].brands_dealt.length > 0}
+                                        {#each top3[2].brands_dealt as b}
+                                            <span class="brand-badge">{b}</span>
+                                        {/each}
+                                    {:else}
+                                        <span class="pedestal-subtitle"
+                                            >Mitra</span
+                                        >
+                                    {/if}
+                                </div>
                                 <div class="pedestal-amount">
                                     <span class="heart-icon">💎</span>
                                     <span class="amount-value"
@@ -422,9 +455,19 @@
                                         {/if}
                                     </div>
                                 </span>
-                                <span class="td-brand"
-                                    >{entry.brand_name || "-"}</span
-                                >
+                                <span class="td-brand">
+                                    {#if entry.brands_dealt.length > 0}
+                                        <div class="table-brand-list">
+                                            {#each entry.brands_dealt as b}
+                                                <span class="brand-badge-sm"
+                                                    >{b}</span
+                                                >
+                                            {/each}
+                                        </div>
+                                    {:else}
+                                        -
+                                    {/if}
+                                </span>
                                 <span class="td-deals">
                                     <span class="deal-pill"
                                         >{entry.deal_count}</span
@@ -795,6 +838,31 @@
         filter: drop-shadow(0 2px 8px rgba(255, 215, 0, 0.3));
     }
 
+    .pedestal-brands {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 4px;
+        margin-bottom: 4px;
+        max-width: 100%;
+    }
+
+    .brand-badge {
+        font-size: 11px;
+        padding: 2px 8px;
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        border-radius: var(--radius-sm);
+        color: var(--text-secondary);
+        white-space: nowrap;
+    }
+
+    :global([data-theme="light"]) .brand-badge {
+        background: rgba(0, 0, 0, 0.04);
+        border-color: rgba(0, 0, 0, 0.08);
+        color: var(--text-muted);
+    }
+
     .pedestal-subtitle {
         font-size: 12px;
         color: var(--text-muted);
@@ -976,8 +1044,24 @@
 
     .td-brand {
         font-size: 14px;
-        font-weight: 500;
-        color: var(--accent-cyan);
+        flex: 1;
+        min-width: 120px;
+    }
+
+    .table-brand-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 4px;
+    }
+
+    .brand-badge-sm {
+        font-size: 11px;
+        padding: 2px 6px;
+        background: var(--bg-card-elevated);
+        border: 1px solid var(--border-color);
+        border-radius: var(--radius-sm);
+        color: var(--text-secondary);
+        white-space: nowrap;
     }
 
     .td-deals {
